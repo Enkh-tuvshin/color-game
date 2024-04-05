@@ -2,6 +2,7 @@ import {
   Button,
   StyleSheet,
   Text,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
@@ -44,6 +45,7 @@ export default function ColorGenerator({ navigation }: any) {
   const [seconds, setSeconds] = useState(60);
   const [round, setRound] = useState(1);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [isWinGame, setIsWinGame] = useState(false);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [tiles, setTiles] = useState<Tile[]>(getRandomColors(9, 100));
@@ -64,21 +66,30 @@ export default function ColorGenerator({ navigation }: any) {
     };
   }, [seconds]);
 
+  useEffect (() => {
+    if(score === 10) {
+      setSeconds(seconds)
+      setIsWinGame(true)
+      setIsGameOver(false)
+    }
+  }, [score])
+ 
   const handleCorrect = () => {
     setScore(score + 1);
-    setSeconds(seconds + 1);
+    setSeconds(seconds);
     setRound(round + 1);
     const newTiles = getRandomColors(9, 100 / score);
     setTiles(newTiles);
   };
 
   const restartGame = () => {
-    setScore;
-    setSeconds;
-    setRound;
+    setScore(0);
+    setSeconds(60);
+    setRound(1);
     const newTiles = getRandomColors(9, 100 / score);
     setTiles(newTiles);
     setIsGameOver(false);
+    setIsWinGame(false)
   };
 
   return (
@@ -118,17 +129,91 @@ export default function ColorGenerator({ navigation }: any) {
             </View>
           ))}
         </View>
+        {isWinGame && (
+          <View style={styles.gameOverView}>
+          <Text style={styles.gameOverText}>
+            You win this game congratulations{"\n"} Таны оноо: {score}
+          </Text>
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              margin: 20,
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => restartGame()}
+              style={{
+                width: 180,
+                borderWidth: 1,
+                padding: 20,
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: 10,
+                borderColor: "white",
+              }}
+            >
+              <Text style={{ color: "white" }}>Start game again</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Home")}
+              style={{
+                width: 180,
+                borderWidth: 1,
+                padding: 20,
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: 10,
+                borderColor: "white",
+              }}
+            >
+              <Text style={{ color: "white" }}>Back</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        )}
         {isGameOver && (
           <View style={styles.gameOverView}>
             <Text style={styles.gameOverText}>
-              Тоглоом дууслаа.{"\n"} Таны оноо: {score}{" "}
+              Тоглоом дууслаа.{"\n"} Таны оноо: {score}
             </Text>
-            <View style={{ width: "100%", flexDirection: 'row', justifyContent: 'space-evenly', margin: 20 }}>
-              <Button title="Шинээр эхлэх" onPress={() => restartGame()} />
-              <Button
-                title="Буцах"
+            <View
+              style={{
+                width: "100%",
+                flexDirection: "row",
+                justifyContent: "space-evenly",
+                margin: 20,
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => restartGame()}
+                style={{
+                  width: 180,
+                  borderWidth: 1,
+                  padding: 20,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: 10,
+                  borderColor: "white",
+                }}
+              >
+                <Text style={{ color: "white" }}>Start game again</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={() => navigation.navigate("Home")}
-              />
+                style={{
+                  width: 180,
+                  borderWidth: 1,
+                  padding: 20,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: 10,
+                  borderColor: "white",
+                }}
+              >
+                <Text style={{ color: "white" }}>Back</Text>
+              </TouchableOpacity>
             </View>
           </View>
         )}
@@ -147,6 +232,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   gameOverText: {
+    width: '100%',
     color: "#fff",
     fontWeight: "bold",
     fontSize: 24,
